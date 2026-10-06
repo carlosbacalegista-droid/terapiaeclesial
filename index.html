@@ -45,6 +45,15 @@ a.call{display:block;text-align:center;background:var(--danger);color:#fff;paddi
 .rec b{font-weight:normal;display:block;line-height:1.3}.rec .small{color:var(--gold)}
 nav button{font-size:.78rem!important}
 .cov{flex:none;width:64px;height:auto;border:1px solid var(--line);border-radius:3px;box-shadow:0 1px 4px rgba(0,0,0,.3);background:#fff}
+.pil{border-top:1px solid var(--line);padding:8px 0}h2+.pil{border-top:0}
+.pil label.chk{border-top:0;padding:4px 0}
+.exb{background:none;border:1px solid var(--gold);color:var(--gold);border-radius:8px;padding:7px 12px;font:inherit;font-size:.85rem;cursor:pointer;margin:4px 0 0 32px}
+.exl{margin:8px 0 0 0}
+.exr{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--line);font-size:.95rem}
+.exr input{width:20px;height:20px;accent-color:var(--gold);flex:none;margin-top:2px}
+.exr .d{color:var(--muted);font-size:.78rem;display:block}
+.tag{display:inline-block;font-size:.7rem;border:1px solid var(--danger);color:var(--danger);border-radius:6px;padding:0 5px;margin-left:4px}
+.exn{font-size:.82rem;color:var(--muted);background:var(--bg);border-radius:8px;padding:8px;margin-bottom:4px}
 </style>
 </head>
 <body>
@@ -77,9 +86,13 @@ nav button{font-size:.78rem!important}
   </div>
   <div class="card">
     <h2>Mis tres pilares</h2>
-    <label class="chk"><input type="checkbox" id="oracion"><span><b>Oración</b><br><span class="small">Mi tiempo de oración de hoy</span></span></label>
-    <label class="chk"><input type="checkbox" id="ayuno"><span><b>Ayuno</b><br><span class="small">Solo si mi terapeuta lo indicó</span></span></label>
-    <label class="chk"><input type="checkbox" id="caridad"><span><b>Caridad</b><br><span class="small">Un acto de amor concreto</span></span></label>
+    <div class="small" style="margin-bottom:4px">Abro la lista, marco el ejercicio que cumplí y el pilar se marca solo.</div>
+    <div class="pil"><label class="chk"><input type="checkbox" id="oracion"><span><b>Oración</b><br><span class="small" id="cnt_o"></span></span></label>
+      <button class="exb" data-k="o">Ver ejercicios ▾</button><div class="exl hide" id="ex_o"></div></div>
+    <div class="pil"><label class="chk"><input type="checkbox" id="ayuno"><span><b>Ayuno</b><br><span class="small" id="cnt_a"></span></span></label>
+      <button class="exb" data-k="a">Ver ejercicios ▾</button><div class="exl hide" id="ex_a"></div></div>
+    <div class="pil"><label class="chk"><input type="checkbox" id="caridad"><span><b>Caridad</b><br><span class="small" id="cnt_c"></span></span></label>
+      <button class="exb" data-k="c">Ver ejercicios ▾</button><div class="exl hide" id="ex_c"></div></div>
   </div>
   <div class="card">
     <h2>Diario breve</h2>
@@ -205,12 +218,34 @@ $('fase').value=S.fase||1;
 $('fase').onchange=function(){S.fase=+this.value;save()};
 EM.forEach(function(e,i){var b=document.createElement('button');b.textContent=e;b.onclick=function(){mood=i+1;paint()};b.setAttribute('aria-label','Ánimo '+(i+1));$('mood').appendChild(b)});
 function paint(){[].forEach.call($('mood').children,function(b,i){b.className=(i+1===mood)?'on':''})}
-var d=S.dias[hoy];
-if(d){mood=d.m||0;$('oracion').checked=!!d.o;$('ayuno').checked=!!d.a;$('caridad').checked=!!d.c;$('nota').value=d.n||''}
+var EX={o:[],a:[],c:[]};var d=S.dias[hoy];
+if(d){mood=d.m||0;$('oracion').checked=!!d.o;$('ayuno').checked=!!d.a;$('caridad').checked=!!d.c;$('nota').value=d.n||'';if(d.e)EX={o:d.e.o||[],a:d.e.a||[],c:d.e.c||[]}}
 paint();
+var EJ={"o": [["Oración de la mañana (ofrecimiento del día)", "5 min"], ["Oración de la noche y examen breve", "5–10 min"], ["Padrenuestro meditado (una frase por día)", "5 min"], ["Avemaría pausada con la respiración (10 veces)", "5 min"], ["Rosario completo", "20 min"], ["Un misterio del Rosario", "5 min"], ["Coronilla de la Divina Misericordia", "10 min"], ["Ángelus", "2 min"], ["Novena", "10–15 min"], ["Letanías", "10 min"], ["Jaculatorias durante el día", "1 min"], ["Oración de Jesús", "10 min"], ["Oración de respiración", "2 min"], ["Oración de quietud (hesiquía)", "10–15 min"], ["Oración de entrega (\"Jesús, en Ti confío\")", "1 min"], ["Lectio Divina", "15 min"], ["Salmo del día", "5 min"], ["Evangelio del día con una frase para llevar", "10 min"], ["Oración con una escena bíblica", "20 min"], ["Memorización de un versículo", "5 min"], ["Examen de conciencia ignaciano", "10 min"], ["Diario de gratitud (tres gracias del día)", "5 min"], ["Diálogo escrito con Dios", "15 min"], ["Oración de lamentación", "10 min"], ["Revisión semanal de la oración", "15 min"], ["Oración por una persona concreta", "3 min"], ["Oración por los difuntos", "10 min"], ["Oración en familia o en pareja", "10 min"], ["Participación en la Misa", "60 min"], ["Adoración eucarística / visita al Santísimo", "30–60 min"]], "a": [["Levantarse a la hora fijada, sin posponer", "Inmediato"], ["Hacer la cama y ordenar el espacio al empezar el día", "5 min"], ["Plan del día: tres tareas prioritarias por escrito", "5 min"], ["Cumplir la primera tarea difícil antes de las 10 a.m.", "Variable"], ["Horario fijo de sueño (acostarse a la misma hora)", "Variable"], ["Ducha fría o templada breve al despertar", "2 min"], ["Abstinencia de dulces o postres", "1 día"], ["Abstinencia de carne los viernes", "1 día"], ["Ayuno parcial de una comida (con orientación médica si hay alguna condición)", "1 comida"], ["Comer sin pantallas ni distracciones, con calma", "En cada comida"], ["Dejar de comer antes de saciarse por completo", "En cada comida"], ["Ayuno de azúcar y bebidas azucaradas", "7 días"], ["Ayuno de redes sociales", "1 día"], ["Límite de uso del celular (horario sin pantalla)", "2 horas"], ["No revisar el celular la primera hora del día", "1 hora"], ["Ayuno de quejas (cero quejas en el día)", "Todo el día"], ["Ayuno de crítica y chisme", "Todo el día"], ["Un acto pequeño de renuncia voluntaria, ofrecido por alguien", "Variable"], ["Silencio deliberado (sin música ni ruido)", "15 min"], ["Esperar sin protestar (filas, tráfico, demoras) como ejercicio", "Variable"], ["Pausa de diez segundos antes de reaccionar con ira", "10 seg"], ["Respuesta amable ante una provocación", "Variable"], ["Decir \"no\" a una tentación concreta identificada", "Variable"], ["Cumplir una promesa pequeña hecha a uno mismo", "Variable"], ["Terminar lo que se empieza (sin dejar tareas a medias)", "Variable"], ["Hábito de 21 días (uno solo, bien definido)", "21 días"], ["Ejercicio físico regular", "30 min"], ["Práctica semanal de una virtud (templanza, paciencia, fortaleza, etc.)", "Todo el día"], ["Examen de voluntad nocturno: ¿cumplí lo que me propuse?", "5 min"], ["Propósito semanal escrito y revisado al final de la semana", "15 min"]], "c": [["Saludar con una sonrisa y por su nombre a las personas del entorno", "Variable"], ["Agradecer de forma explícita a alguien", "1 min"], ["Un gesto amable y concreto hacia alguien", "Variable"], ["Escuchar sin interrumpir ni mirar el celular", "10 min"], ["Ceder el asiento, el paso o el turno", "Variable"], ["Elogio sincero a alguien", "1 min"], ["Mensaje de ánimo a alguien que lo necesite", "5 min"], ["Llamar o visitar a un familiar o amigo que está solo", "20–30 min"], ["Tiempo de calidad con la familia, sin pantallas", "20 min"], ["Ayudar en una tarea del hogar sin que se pida", "15 min"], ["Servicio escondido: hacer un favor sin que nadie lo sepa", "Variable"], ["Ayudar a un vecino o compañero con una necesidad concreta", "Variable"], ["Visita a un enfermo (hogar, hospital o albergue)", "1 hora"], ["Visita o acompañamiento a un anciano", "1 hora"], ["Dar de comer al hambriento (comedor, olla común o una comida compartida)", "Variable"], ["Donación de ropa, calzado o alimentos", "Variable"], ["Limosna o aporte económico a una obra de caridad", "Variable"], ["Voluntariado en la parroquia o en una obra social", "2 horas"], ["Acompañar a una persona en duelo", "Variable"], ["Enseñar algo a quien lo necesita (leer, un oficio, una tarea escolar)", "1 hora"], ["Aconsejar con prudencia y cariño a quien lo pide", "Variable"], ["Consolar al triste", "Variable"], ["Perdonar una ofensa concreta", "Variable"], ["Pedir perdón a quien se ha ofendido", "Variable"], ["Soportar con paciencia los defectos de alguien cercano", "Variable"], ["Bendecir y orar por alguien que cuesta querer", "3 min"], ["Cuidar la lengua: no hablar mal de nadie", "Todo el día"], ["Aceptar con gratitud una ayuda o un gesto de cariño", "Variable"], ["Pedir ayuda a alguien de confianza cuando se necesita", "Variable"], ["Examen de caridad nocturno: ¿a quién amé hoy y a quién dejé de amar?", "5 min"]]};
+var FOOD=[6,7,8,10,11];
+var PID={o:'oracion',a:'ayuno',c:'caridad'};
+function saveDay(){S.dias[hoy]={m:mood,o:$('oracion').checked,a:$('ayuno').checked,c:$('caridad').checked,n:$('nota').value.trim(),f:S.fase,e:EX};save()}
+function cnt(k){$('cnt_'+k).textContent=EX[k].length+' de '+EJ[k].length+' ejercicios hoy'}
+function buildEx(k){
+  var box=$('ex_'+k);box.innerHTML='';
+  if(k==='a'){var n=document.createElement('div');n.className='exn';
+    n.textContent='Los ejercicios con la etiqueta «Alimentación» solo si mi terapeuta o mi médico lo indicó. Si tengo dificultades con la comida, no los hago sin consultarlo.';box.appendChild(n)}
+  EJ[k].forEach(function(r,i){
+    var l=document.createElement('label');l.className='exr';
+    var c=document.createElement('input');c.type='checkbox';c.checked=EX[k].indexOf(i)>=0;
+    c.onchange=function(){var j=EX[k].indexOf(i);if(c.checked&&j<0)EX[k].push(i);if(!c.checked&&j>=0)EX[k].splice(j,1);
+      $(PID[k]).checked=EX[k].length>0;cnt(k);saveDay()};
+    var s=document.createElement('span');s.textContent=r[0];
+    if(k==='a'&&FOOD.indexOf(i)>=0){var t=document.createElement('span');t.className='tag';t.textContent='Alimentación';s.appendChild(t)}
+    var d=document.createElement('span');d.className='d';d.textContent=r[1];s.appendChild(d);
+    l.appendChild(c);l.appendChild(s);box.appendChild(l)});
+  cnt(k);
+}
+['o','a','c'].forEach(buildEx);
+[].forEach.call(document.querySelectorAll('.exb'),function(b){b.onclick=function(){
+  var bx=$('ex_'+b.dataset.k),op=bx.className.indexOf('hide')>=0;bx.className=op?'exl':'exl hide';b.textContent=op?'Ocultar ejercicios ▴':'Ver ejercicios ▾'}});
 $('guardar').onclick=function(){
-  S.dias[hoy]={m:mood,o:$('oracion').checked,a:$('ayuno').checked,c:$('caridad').checked,n:$('nota').value.trim(),f:S.fase};
-  save();$('ok').className='small';setTimeout(function(){$('ok').className='small hide'},1800);render();
+  saveDay();$('ok').className='small';setTimeout(function(){$('ok').className='small hide'},1800);render();
 };
 function score(x){return x?(x.o?1:0)+(x.a?1:0)+(x.c?1:0):0}
 function render(){
@@ -351,7 +386,10 @@ $('gRes').onclick=function(){
   L.push('Fase actual: '+FASES[(S.fase||1)-1]);
   L.push('Días registrados (14 días): '+n+'/14');
   L.push('Ánimo promedio: '+prom+' / 5');
+  var ce={o:0,a:0,c:0};
+  for(i=0;i<14;i++){q=new Date();q.setDate(q.getDate()-i);y=S.dias[iso(q)];if(y&&y.e){['o','a','c'].forEach(function(k){ce[k]+=(y.e[k]||[]).length})}}
   L.push('Pilares cumplidos: '+t+' / 42');
+  L.push('Ejercicios marcados (14 días): oración '+ce.o+', ayuno '+ce.a+', caridad '+ce.c);
   L.push(u?('Última autoevaluación ('+u.d+'): '+u.t+' / 30'):'Sin autoevaluaciones');
   if($('inclNotas').checked){L.push('','Anotaciones:');
     Object.keys(S.dias).sort().slice(-14).forEach(function(k){if(S.dias[k].n)L.push('- '+k+': '+S.dias[k].n)})}
