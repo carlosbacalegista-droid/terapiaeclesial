@@ -3,6 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14213d">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Mi Seguimiento">
 <title>Terapia Eclesial · Mi Seguimiento</title>
 <style>
 :root{--bg:#f7f4ec;--card:#fff;--ink:#14213d;--gold:#b08a2e;--muted:#6b7280;--line:#e5dfcf;--danger:#8b1e2d;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -30,10 +37,12 @@ nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--card);b
 nav button{flex:1;padding:12px 4px;border:0;background:none;font:inherit;font-size:.85rem;color:var(--muted);cursor:pointer}
 nav button.on{color:var(--gold);font-weight:bold}
 .sos{position:fixed;right:14px;bottom:calc(66px + env(safe-area-inset-bottom,0px));background:var(--danger);color:#fff;border:0;border-radius:999px;padding:12px 16px;font:inherit;font-weight:bold;box-shadow:0 2px 8px rgba(0,0,0,.3);cursor:pointer}
-.bars{display:flex;gap:6px;align-items:flex-end;height:90px}
-.bar{flex:1;background:var(--gold);border-radius:4px 4px 0 0;min-height:4px;opacity:.85}
-.bars div.col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
+.bars{display:flex;gap:6px;align-items:flex-end;height:112px}
+.bar{flex:none;width:100%;max-width:34px;background:var(--gold);border-radius:4px 4px 0 0;min-height:4px}
+.bars div.col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:3px}
 .bars span{font-size:.7rem;color:var(--muted)}
+.bars .n{color:var(--ink);font-weight:bold;font-size:.78rem}
+.bars .hoy{color:var(--gold);font-weight:bold}
 .hide{display:none}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center;z-index:9}
 .modal .box{background:var(--card);border-radius:16px 16px 0 0;padding:18px;width:100%;max-width:560px;padding-bottom:calc(18px + env(safe-area-inset-bottom,0px))}
@@ -252,9 +261,10 @@ function render(){
   var bars=$('bars');bars.innerHTML='';
   for(var i=6;i>=0;i--){var dt=new Date();dt.setDate(dt.getDate()-i);var k=iso(dt),x=S.dias[k],s=score(x);
     var col=document.createElement('div');col.className='col';
-    var b=document.createElement('div');b.className='bar';b.style.height=(s/3*100)+'%';
-    var l=document.createElement('span');l.textContent=dt.toLocaleDateString('es-PE',{weekday:'narrow'});
-    col.appendChild(b);col.appendChild(l);bars.appendChild(col)}
+    var n=document.createElement('span');n.className='n';n.textContent=s?s+'/3':'';
+    var b=document.createElement('div');b.className='bar';b.style.height=(4+s*20)+'px';if(!s)b.style.opacity='.25';
+    var l=document.createElement('span');l.textContent=dt.toLocaleDateString('es-PE',{weekday:'narrow'})+' '+dt.getDate();if(i===0)l.className='hoy';
+    col.appendChild(n);col.appendChild(b);col.appendChild(l);bars.appendChild(col)}
   var ks=Object.keys(S.dias).sort().reverse(), racha=0, c=new Date();
   while(S.dias[iso(c)]){racha++;c.setDate(c.getDate()-1)}
   var m7=[],t=0;for(var j=0;j<7;j++){var q=new Date();q.setDate(q.getDate()-j);var y=S.dias[iso(q)];if(y&&y.m)m7.push(y.m);t+=score(y)}
@@ -400,5 +410,6 @@ $('cRes').onclick=function(){var b=this,t=$('resTxt');t.select();
   setTimeout(function(){b.textContent='Copiar'},1800)};
 })();
 </script>
+<script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){})})}</script>
 </body>
 </html>
