@@ -118,6 +118,11 @@ nav button{font-size:.78rem!important}
     <div class="small" style="margin-top:8px">Altura = pilares cumplidos (de 3)</div>
   </div>
   <div class="card">
+    <h2>Mi autoevaluación semanal</h2>
+    <div class="bars" id="evBars"></div>
+    <div class="small" id="evNote" style="margin-top:8px"></div>
+  </div>
+  <div class="card">
     <h2>Resumen</h2>
     <div id="resumen"></div>
   </div>
@@ -257,7 +262,20 @@ $('guardar').onclick=function(){
   saveDay();$('ok').className='small';setTimeout(function(){$('ok').className='small hide'},1800);render();
 };
 function score(x){return x?(x.o?1:0)+(x.a?1:0)+(x.c?1:0):0}
+function renderEv(){
+  var B=$('evBars');B.innerHTML='';var E=(S.evals||[]).slice(-8);
+  if(!E.length){$('evNote').textContent='Aún no hay autoevaluaciones. Se hacen en la pestaña «Mi fase».';return}
+  E.forEach(function(e){
+    var col=document.createElement('div');col.className='col';
+    var n=document.createElement('span');n.className='n';n.textContent=e.t;
+    var b=document.createElement('div');b.className='bar';b.style.height=(4+Math.round(e.t/30*66))+'px';
+    var l=document.createElement('span');var p=e.d.split('-');l.textContent=p[2]+'/'+p[1];
+    col.appendChild(n);col.appendChild(b);col.appendChild(l);B.appendChild(col)});
+  var u=E[E.length-1];
+  $('evNote').textContent='Altura = puntaje total (de 30). Última: '+u.t+' / 30 · Fase '+u.f+'.';
+}
 function render(){
+  renderEv();
   var bars=$('bars');bars.innerHTML='';
   for(var i=6;i>=0;i--){var dt=new Date();dt.setDate(dt.getDate()-i);var k=iso(dt),x=S.dias[k],s=score(x);
     var col=document.createElement('div');col.className='col';
